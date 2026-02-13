@@ -1,0 +1,461 @@
+<!--
+Open-source Valentine Ask Page
+Deploy to GitHub Pages (no backend)
+
+FILES:
+1) index.html  (this file)
+
+How it works:
+- Supports URL params: ?from=Samarth&to=Name
+- “No” button runs away (desktop + mobile)
+- “Yes” shows success screen
+- Optional: copy-share link button
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will You Be My Valentine?</title>
+
+  <style>
+    :root{
+      --bg1:#ffdde1;
+      --bg2:#ee9ca7;
+      --card:#ffffffcc;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --yes:#16a34a;
+      --yes2:#22c55e;
+      --no:#ef4444;
+      --no2:#f87171;
+      --shadow: 0 20px 60px rgba(0,0,0,.12);
+      --radius: 22px;
+    }
+
+    *{ box-sizing: border-box; }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 20% 10%, #fff 0%, transparent 45%),
+                  radial-gradient(1200px 800px at 80% 90%, #fff 0%, transparent 40%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      overflow:hidden;
+    }
+
+    /* floating hearts */
+    .hearts{
+      position: fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.25;
+      filter: blur(.2px);
+    }
+    .heart{
+      position:absolute;
+      width: 18px;
+      height: 18px;
+      transform: rotate(45deg);
+      background: #ff2d55;
+      animation: floatUp linear infinite;
+    }
+    .heart::before,
+    .heart::after{
+      content:"";
+      position:absolute;
+      width: 18px;
+      height: 18px;
+      background: #ff2d55;
+      border-radius: 50%;
+    }
+    .heart::before{ left:-9px; }
+    .heart::after{ top:-9px; }
+
+    @keyframes floatUp{
+      from{ transform: translateY(40vh) rotate(45deg); }
+      to{ transform: translateY(-120vh) rotate(45deg); }
+    }
+
+    .wrap{
+      width: min(560px, 100%);
+      position: relative;
+      z-index: 5;
+    }
+
+    .card{
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(12px);
+    }
+
+    .top{
+      display:flex;
+      gap: 14px;
+      align-items:center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.65);
+      border: 1px solid rgba(0,0,0,.05);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .badge span{
+      font-weight: 800;
+    }
+
+    .tiny{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    h1{
+      margin: 10px 0 6px;
+      font-size: clamp(26px, 3.6vw, 36px);
+      line-height: 1.1;
+      letter-spacing: -.02em;
+    }
+
+    p{
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .names{
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .stage{
+      position: relative;
+      width: 100%;
+      height: 160px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.55);
+      border: 1px dashed rgba(0,0,0,.08);
+      overflow: hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-top: 14px;
+    }
+
+    .buttons{
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    button{
+      border: 0;
+      cursor: pointer;
+      font-weight: 900;
+      font-size: 16px;
+      border-radius: 999px;
+      padding: 14px 18px;
+      transition: transform .12s ease, filter .12s ease;
+      box-shadow: 0 14px 25px rgba(0,0,0,.12);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active{ transform: scale(.98); }
+
+    .yes{
+      background: linear-gradient(135deg, var(--yes), var(--yes2));
+      color: white;
+      position:absolute;
+      left: 22px;
+      top: 56px;
+      width: 160px;
+    }
+
+    .no{
+      background: linear-gradient(135deg, var(--no), var(--no2));
+      color: white;
+      position:absolute;
+      right: 22px;
+      top: 56px;
+      width: 160px;
+    }
+
+    .yes:hover, .no:hover{ filter: brightness(1.05); }
+
+    .footer{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      justify-content: space-between;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .linkbox{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      width: 100%;
+    }
+
+    .linkbox input{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,.12);
+      padding: 12px 12px;
+      font-weight: 700;
+      background: rgba(255,255,255,.75);
+      outline: none;
+    }
+
+    .copy{
+      background: rgba(255,255,255,.9);
+      color: var(--text);
+      border: 1px solid rgba(0,0,0,.12);
+      box-shadow: none;
+      padding: 12px 14px;
+      font-weight: 900;
+      border-radius: 14px;
+      white-space: nowrap;
+    }
+
+    .toast{
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #065f46;
+      display:none;
+    }
+
+    /* success screen */
+    .success{
+      display:none;
+      text-align:center;
+      padding: 28px 18px;
+    }
+
+    .success h2{
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: -.02em;
+    }
+
+    .success p{
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .bigHeart{
+      font-size: 58px;
+      margin-bottom: 8px;
+      animation: pop .9s ease-in-out infinite;
+    }
+
+    @keyframes pop{
+      0%,100%{ transform: scale(1); }
+      50%{ transform: scale(1.08); }
+    }
+
+    /* mobile */
+    @media (max-width: 480px){
+      .stage{ height: 190px; }
+      .yes, .no{ width: 140px; }
+      .yes{ left: 16px; }
+      .no{ right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts" id="hearts"></div>
+
+  <div class="wrap">
+    <div class="card" id="mainCard">
+      <div class="top">
+        <div class="badge">💌 <span>Valentine Ask</span></div>
+        <div class="tiny" id="tinyText">Open-source • GitHub Pages</div>
+      </div>
+
+      <h1 id="title">Will you be my Valentine?</h1>
+      <p id="subtitle">
+        <span class="names" id="namesLine">From <b>Someone</b> to <b>You</b></span>
+        <br />
+        I promise I’m very cute and will share fries.
+      </p>
+
+      <div class="stage" id="stage">
+        <div class="buttons">
+          <button class="yes" id="yesBtn">Yes 💘</button>
+          <button class="no" id="noBtn">No 🙃</button>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div class="linkbox">
+          <input id="shareLink" readonly />
+          <button class="copy" id="copyBtn">Copy Link</button>
+        </div>
+        <div class="toast" id="toast">Copied! Now go send it 😌</div>
+      </div>
+
+      <div class="success" id="success">
+        <div class="bigHeart">❤️</div>
+        <h2 id="successTitle">YAYYYYY!</h2>
+        <p id="successText">Best decision ever 😌</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --------- Helpers ---------
+    const $ = (id) => document.getElementById(id);
+
+    function getParam(name, fallback = ""){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name) || fallback;
+    }
+
+    function clamp(n, min, max){
+      return Math.max(min, Math.min(max, n));
+    }
+
+    // --------- Personalization via URL params ---------
+    // Example:
+    // https://YOURNAME.github.io/valentine/?from=Samarth&to=HerName
+    const from = getParam("from", "Someone");
+    const to = getParam("to", "You");
+
+    $("namesLine").innerHTML = `From <b>${escapeHtml(from)}</b> to <b>${escapeHtml(to)}</b>`;
+
+    // --------- Share link box ---------
+    // Keeps current params
+    $("shareLink").value = window.location.href;
+
+    $("copyBtn").addEventListener("click", async () => {
+      try{
+        await navigator.clipboard.writeText(window.location.href);
+        $("toast").style.display = "block";
+        setTimeout(() => $("toast").style.display = "none", 1600);
+      }catch(e){
+        alert("Copy failed. You can manually copy the link from the box.");
+      }
+    });
+
+    // --------- Hearts background ---------
+    const hearts = $("hearts");
+    for(let i=0;i<18;i++){
+      const h = document.createElement("div");
+      h.className = "heart";
+      h.style.left = Math.random()*100 + "%";
+      h.style.animationDuration = (6 + Math.random()*7) + "s";
+      h.style.opacity = (0.15 + Math.random()*0.25);
+      h.style.transform = `translateY(${20+Math.random()*40}vh) rotate(45deg)`;
+      hearts.appendChild(h);
+    }
+
+    // --------- Button logic ---------
+    const stage = $("stage");
+    const noBtn = $("noBtn");
+    const yesBtn = $("yesBtn");
+
+    let noCount = 0;
+
+    function moveNoButton(){
+      noCount++;
+
+      const rect = stage.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      // Safe bounds inside the stage
+      const padding = 12;
+      const maxX = rect.width - btnRect.width - padding;
+      const maxY = rect.height - btnRect.height - padding;
+
+      // Random positions
+      const x = clamp(Math.random()*maxX, padding, maxX);
+      const y = clamp(Math.random()*maxY, padding, maxY);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+      noBtn.style.right = "auto";
+
+      // Make YES button grow slightly each time (funny + increases conversion)
+      const scale = clamp(1 + noCount*0.06, 1, 1.55);
+      yesBtn.style.transform = `scale(${scale})`;
+
+      // After too many tries, change the No text
+      if(noCount === 3) noBtn.textContent = "Are you sure? 😭";
+      if(noCount === 6) noBtn.textContent = "Don’t do this 😤";
+      if(noCount === 9) noBtn.textContent = "Okay stop 😵";
+      if(noCount >= 12) noBtn.textContent = "Fine… 😶";
+    }
+
+    // Desktop hover
+    noBtn.addEventListener("mouseenter", moveNoButton);
+
+    // Mobile tap
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    }, {passive:false});
+
+    // If they still manage to click NO
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // YES = success screen
+    yesBtn.addEventListener("click", () => {
+      $("success").style.display = "block";
+      stage.style.display = "none";
+      $("subtitle").innerHTML = `
+        <span class="names">${escapeHtml(to)}</span>, you just made <span class="names">${escapeHtml(from)}</span> the happiest person alive 🥹
+      `;
+
+      $("successTitle").textContent = "YAYYYYY!";
+      $("successText").textContent = "Now go claim your date 😌💘";
+
+      // Optional confetti-ish: add more hearts
+      for(let i=0;i<10;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.style.left = Math.random()*100 + "%";
+        h.style.animationDuration = (3 + Math.random()*4) + "s";
+        h.style.opacity = (0.25 + Math.random()*0.35);
+        hearts.appendChild(h);
+      }
+    });
+
+    // --------- Security: escape HTML in URL params ---------
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
