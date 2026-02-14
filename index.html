@@ -1,3 +1,17 @@
+<!--
+Open-source Valentine Ask Page
+Deploy to GitHub Pages (no backend)
+
+FILES:
+1) index.html  (this file)
+
+How it works:
+- Supports URL params: ?from=Samarth&to=Name
+- “No” button runs away (desktop + mobile)
+- “Yes” shows success screen
+- Optional: copy-share link button
+-->
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -44,7 +58,6 @@
       pointer-events:none;
       opacity:.25;
       filter: blur(.2px);
-      z-index: 1;
     }
     .heart{
       position:absolute;
@@ -69,26 +82,6 @@
     @keyframes floatUp{
       from{ transform: translateY(40vh) rotate(45deg); }
       to{ transform: translateY(-120vh) rotate(45deg); }
-    }
-
-    /* floating beer mugs */
-    .beers{
-      position: fixed;
-      inset:0;
-      pointer-events:none;
-      opacity: .35;
-      z-index: 2;
-    }
-
-    .beer{
-      position:absolute;
-      font-size: 32px;
-      animation: floatUpBeer linear infinite;
-    }
-
-    @keyframes floatUpBeer{
-      from{ transform: translateY(40vh) rotate(-6deg); }
-      to{ transform: translateY(-120vh) rotate(10deg); }
     }
 
     .wrap{
@@ -154,6 +147,28 @@
       font-weight: 800;
       color: var(--text);
     }
+
+    /* Love letter box */
+    .letter{
+      margin-top: 14px;
+      padding: 16px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid rgba(0,0,0,.06);
+      box-shadow: 0 10px 25px rgba(0,0,0,.06);
+      max-height: 220px;
+      overflow: auto;
+      display:block;
+    }
+
+    .letter p{
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: #374151;
+      font-weight: 650;
+    }
+
 
     .stage{
       position: relative;
@@ -284,56 +299,51 @@
       50%{ transform: scale(1.08); }
     }
 
-    /* Photos after YES */
+    /* Photo gallery (after YES) */
     .gallery{
+      margin: 14px 0 14px;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-top: 16px;
+      gap: 10px;
+      animation: fadeInUp .5s ease both;
     }
 
     .gallery img{
       width: 100%;
-      height: 120px;
+      height: 110px;
       object-fit: cover;
-      border-radius: 18px;
+      border-radius: 16px;
       border: 1px solid rgba(0,0,0,.08);
-      box-shadow: 0 12px 22px rgba(0,0,0,.10);
+      box-shadow: 0 10px 20px rgba(0,0,0,.08);
     }
 
-    .loveLetter{
-      text-align: left;
-      margin-top: 16px;
-      background: rgba(255,255,255,.75);
-      border: 1px solid rgba(0,0,0,.08);
-      padding: 16px;
-      border-radius: 18px;
-      font-size: 15px;
-      line-height: 1.7;
-      color: #111827;
+    @keyframes fadeInUp{
+      from{ opacity: 0; transform: translateY(10px); }
+      to{ opacity: 1; transform: translateY(0); }
+    }
+
+      50%{ transform: scale(1.08); }
     }
 
     /* mobile */
     @media (max-width: 480px){
+      .gallery{
+        grid-template-columns: 1fr;
+      }
+      .gallery img{
+        height: 170px;
+      }
+
+
       .stage{ height: 190px; }
       .yes, .no{ width: 140px; }
       .yes{ left: 16px; }
       .no{ right: 16px; }
-
-      .gallery{
-        grid-template-columns: 1fr;
-      }
-
-      .gallery img{
-        height: 180px;
-      }
     }
   </style>
 </head>
-
 <body>
   <div class="hearts" id="hearts"></div>
-  <div class="beers" id="beers"></div>
 
   <div class="wrap">
     <div class="card" id="mainCard">
@@ -343,12 +353,33 @@
       </div>
 
       <h1 id="title">Will you be my Valentine?</h1>
-
       <p id="subtitle">
-        <span class="names" id="namesLine">From <b>Samarth</b> to <b>Advika</b></span>
+        <span class="names" id="namesLine">From <b>Someone</b> to <b>You</b></span>
         <br />
-        Advika please please please 💌🥹
+        I promise I’ll make yummy Daali Thoy and cute little Podi's.
       </p>
+
+      <!-- Love letter (hidden until she clicks YES) -->
+      <div class="letter" id="loveLetter" style="display:none;">
+        <p>
+          I still remember seeing you for the very first time and my heart skipped a beat.
+          Maybe at that time it was not love…
+          <br /><br />
+          But secretly it felt special. Very special.
+          <br /><br />
+          You replying to my stories and trying to strike a conversation or even get into my Kannada class…
+          it all felt special.
+          <br /><br />
+          I was falling unintentionally. Your warm smile always created a sparkle.
+          <br /><br />
+          What a beautiful charmer. I fell not only for how beautiful you were (are also)
+          but also for the kind, love spreading and joyful person you are.
+          <br /><br />
+          I love you gundu ❤️
+          <br /><br />
+          Thank you for everything.
+        </p>
+      </div>
 
       <div class="stage" id="stage">
         <div class="buttons">
@@ -367,32 +398,15 @@
 
       <div class="success" id="success">
         <div class="bigHeart">❤️</div>
+
+        <!-- Photo gallery (shows after YES) -->
+        <div class="gallery" id="photoGallery">
+          <img src="images/advika1.jpg" alt="Advika 1" />
+          <img src="images/us.jpg" alt="Us" />
+          <img src="images/advika2.jpg" alt="Advika 2" />
+        </div>
         <h2 id="successTitle">YAYYYYY!</h2>
-
-        <p id="successText">
-          You just make love feel so easy… like it’s natural 🥹❤️
-        </p>
-
-        <div class="gallery">
-          <img src="images/advika1.jpg" alt="Advika 1">
-          <img src="images/us.jpg" alt="Us">
-          <img src="images/advika2.jpg" alt="Advika 2">
-        </div>
-
-        <div class="loveLetter">
-          Advika…<br><br>
-          I still remember seeing you for the very first time and my heart skipped a beat.<br>
-          Maybe at that time it was not love… but secretly it felt special, very special.<br><br>
-
-          You replying to my stories and trying to strike a conversation — or even getting into my Kannada class — it all felt special.<br><br>
-
-          I was falling unintentionally. Your warm smile always created a sparkle.<br><br>
-
-          What a beautiful charmer… I fell not only for how beautiful you were (and still are), but also for the kind, love-spreading and joyful person you are.<br><br>
-
-          I love you gundu ❤️<br>
-          Thank you for everything.
-        </div>
+        <p id="successText">Best decision ever 😌</p>
       </div>
     </div>
   </div>
@@ -410,22 +424,16 @@
       return Math.max(min, Math.min(max, n));
     }
 
-    function escapeHtml(str){
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    // --------- Defaults + URL params ---------
-    const from = getParam("from", "Samarth");
-    const to = getParam("to", "Advika");
+    // --------- Personalization via URL params ---------
+    // Example:
+    // https://YOURNAME.github.io/valentine/?from=Samarth&to=HerName
+    const from = getParam("from", "Samarth and Advika");
+    const to = getParam("to", "Vikasam");
 
     $("namesLine").innerHTML = `From <b>${escapeHtml(from)}</b> to <b>${escapeHtml(to)}</b>`;
 
     // --------- Share link box ---------
+    // Keeps current params
     $("shareLink").value = window.location.href;
 
     $("copyBtn").addEventListener("click", async () => {
@@ -446,19 +454,8 @@
       h.style.left = Math.random()*100 + "%";
       h.style.animationDuration = (6 + Math.random()*7) + "s";
       h.style.opacity = (0.15 + Math.random()*0.25);
+      h.style.transform = `translateY(${20+Math.random()*40}vh) rotate(45deg)`;
       hearts.appendChild(h);
-    }
-
-    // --------- Beer mugs background ---------
-    const beers = $("beers");
-    for(let i=0;i<12;i++){
-      const b = document.createElement("div");
-      b.className = "beer";
-      b.textContent = "🍺";
-      b.style.left = Math.random()*100 + "%";
-      b.style.animationDuration = (7 + Math.random()*9) + "s";
-      b.style.opacity = (0.15 + Math.random()*0.25);
-      beers.appendChild(b);
     }
 
     // --------- Button logic ---------
@@ -474,10 +471,12 @@
       const rect = stage.getBoundingClientRect();
       const btnRect = noBtn.getBoundingClientRect();
 
+      // Safe bounds inside the stage
       const padding = 12;
       const maxX = rect.width - btnRect.width - padding;
       const maxY = rect.height - btnRect.height - padding;
 
+      // Random positions
       const x = clamp(Math.random()*maxX, padding, maxX);
       const y = clamp(Math.random()*maxY, padding, maxY);
 
@@ -485,20 +484,27 @@
       noBtn.style.top = y + "px";
       noBtn.style.right = "auto";
 
+      // Make YES button grow slightly each time (funny + increases conversion)
       const scale = clamp(1 + noCount*0.06, 1, 1.55);
       yesBtn.style.transform = `scale(${scale})`;
 
+      // After too many tries, change the No text
       if(noCount === 3) noBtn.textContent = "Are you sure? 😭";
       if(noCount === 6) noBtn.textContent = "Don’t do this 😤";
       if(noCount === 9) noBtn.textContent = "Okay stop 😵";
       if(noCount >= 12) noBtn.textContent = "Fine… 😶";
     }
 
+    // Desktop hover
     noBtn.addEventListener("mouseenter", moveNoButton);
+
+    // Mobile tap
     noBtn.addEventListener("touchstart", (e) => {
       e.preventDefault();
       moveNoButton();
     }, {passive:false});
+
+    // If they still manage to click NO
     noBtn.addEventListener("click", (e) => {
       e.preventDefault();
       moveNoButton();
@@ -508,12 +514,15 @@
     yesBtn.addEventListener("click", () => {
       $("success").style.display = "block";
       stage.style.display = "none";
-
+      $("loveLetter").style.display = "block";
       $("subtitle").innerHTML = `
-        <span class="names">${escapeHtml(to)}</span>, you just make love feel so easy… like it’s natural 🥹❤️
+        <span class="names">${escapeHtml(to)}</span>, you just make <span class="names">${escapeHtml(from)}</span>  feel eternal 🥹
       `;
 
-      // Add more hearts
+      $("successTitle").textContent = "YAYYYYY!";
+      $("successText").textContent = "Now go claim your date 😌💘";
+
+      // Optional confetti-ish: add more hearts
       for(let i=0;i<10;i++){
         const h = document.createElement("div");
         h.className = "heart";
@@ -522,18 +531,18 @@
         h.style.opacity = (0.25 + Math.random()*0.35);
         hearts.appendChild(h);
       }
-
-      // Add more beers 😄
-      for(let i=0;i<6;i++){
-        const b = document.createElement("div");
-        b.className = "beer";
-        b.textContent = "🍻";
-        b.style.left = Math.random()*100 + "%";
-        b.style.animationDuration = (3 + Math.random()*4) + "s";
-        b.style.opacity = (0.18 + Math.random()*0.25);
-        beers.appendChild(b);
-      }
     });
+
+    // --------- Security: escape HTML in URL params ---------
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
   </script>
 </body>
 </html>
+
